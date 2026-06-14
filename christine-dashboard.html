@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Christine Ross — Community Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --gold: #E8B84B;
+    --gold-light: #F5D78E;
+    --gold-dark: #C49A2A;
+    --plum: #3D1F5C;
+    --plum-mid: #5B3080;
+    --cream: #FFFDF7;
+    --ink: #1A1018;
+    --muted: #7A6E85;
+    --card: #FFFFFF;
+    --border: #EDE0C8;
+    --green: #2E9E6B;
+    --rose: #C4607A;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, var(--plum) 0%, var(--plum-mid) 60%, #7A3FA0 100%);
+    padding: 28px 20px 24px;
+    color: white;
+  }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  .header-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: var(--gold-light);
+    line-height: 1.1;
+  }
+  .header-sub { font-size: 0.78rem; color: rgba(255,255,255,0.65); margin-top: 3px; }
+  .fire { font-size: 1.4rem; }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+  .stat-box {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(232,184,75,0.3);
+    border-radius: 14px;
+    padding: 12px 10px;
+    text-align: center;
+  }
+  .stat-box .num {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+    font-family: 'Playfair Display', serif;
+  }
+  .stat-box .num-input {
+    width: 60px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--gold);
+    color: var(--gold);
+    font-size: 1.6rem;
+    font-weight: 700;
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    outline: none;
+  }
+  .stat-box .slabel { font-size: 0.68rem; color: rgba(255,255,255,0.65); margin-top: 4px; }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    background: var(--card);
+    border-bottom: 2px solid var(--border);
+    overflow-x: auto;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .tab {
+    flex: 1;
+    min-width: 72px;
+    padding: 13px 6px;
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .tab.active { color: var(--plum); border-bottom-color: var(--gold); font-weight: 700; }
+  .tab-icon { font-size: 1rem; display: block; margin-bottom: 2px; }
+
+  .section { display: none; padding: 18px 16px; }
+  .section.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 14px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 10px rgba(61,31,92,0.06);
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    color: var(--plum);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--plum); margin-bottom: 4px; }
+  .section-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 16px; line-height: 1.4; }
+
+  /* FORM */
+  .form-group { margin-bottom: 14px; }
+  label { display: block; font-size: 0.74rem; font-weight: 600; color: var(--plum); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+  input, select, textarea {
+    width: 100%; padding: 11px 13px; border: 2px solid var(--border);
+    border-radius: 12px; font-size: 0.88rem; font-family: 'Inter', sans-serif;
+    background: var(--cream); color: var(--ink); outline: none; transition: border-color 0.2s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--plum); }
+  textarea { resize: vertical; min-height: 70px; }
+
+  .btn {
+    display: block; width: 100%; padding: 12px 20px;
+    border-radius: 24px; border: none; font-size: 0.88rem;
+    font-weight: 600; cursor: pointer; text-align: center; transition: all 0.2s;
+  }
+  .btn-plum { background: var(--plum); color: white; }
+  .btn-gold { background: var(--gold); color: var(--plum); }
+  .btn-sm {
+    display: inline-block; width: auto; padding: 7px 16px;
+    font-size: 0.78rem; border-radius: 20px;
+  }
+
+  /* MEMBER LIST */
+  .member-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .member-item:last-child { border-bottom: none; }
+  .member-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--plum), var(--plum-mid));
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gold); font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
+  }
+  .member-name { font-weight: 600; font-size: 0.88rem; flex: 1; }
+  .member-meta { font-size: 0.74rem; color: var(--muted); }
+  .member-tag {
+    font-size: 0.7rem; font-weight: 600; padding: 3px 9px;
+    border-radius: 10px; background: var(--border); color: var(--muted);
+  }
+  .tag-active { background: #e6f7ed; color: var(--green); }
+  .tag-new { background: #f0e8ff; color: var(--plum-mid); }
+
+  /* CONTENT CALENDAR */
+  .content-item {
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .content-item:last-child { border-bottom: none; }
+  .content-day {
+    background: var(--plum); color: var(--gold);
+    border-radius: 10px; padding: 6px 10px;
+    font-size: 0.7rem; font-weight: 700; text-align: center;
+    min-width: 46px; flex-shrink: 0; line-height: 1.3;
+  }
+  .content-text { font-size: 0.85rem; line-height: 1.5; flex: 1; }
+  .content-type { font-size: 0.72rem; color: var(--muted); margin-top: 3px; }
+  .check-btn {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: 2px solid var(--border); background: transparent;
+    cursor: pointer; flex-shrink: 0; margin-top: 2px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; transition: all 0.2s;
+  }
+  .check-btn.done { background: var(--green); border-color: var(--green); color: white; }
+
+  /* PROMPTS */
+  .prompt-card {
+    background: linear-gradient(135deg, #f8f0ff, #fff5e6);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .prompt-card:active { transform: scale(0.98); }
+  .prompt-label {
+    font-size: 0.7rem; font-weight: 700; color: var(--plum-mid);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;
+  }
+  .prompt-text { font-size: 0.88rem; line-height: 1.5; color: var(--ink); }
+  .prompt-tap { font-size: 0.72rem; color: var(--muted); margin-top: 8px; }
+
+  /* AI CHAT */
+  .chat-box {
+    background: var(--cream);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    height: 320px;
+    overflow-y: auto;
+    padding: 14px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .msg { max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 0.85rem; line-height: 1.5; }
+  .msg-ai { background: white; border: 1px solid var(--border); color: var(--ink); align-self: flex-start; border-bottom-left-radius: 4px; }
+  .msg-user { background: var(--plum); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+  .msg-thinking { color: var(--muted); font-style: italic; font-size: 0.8rem; }
+
+  .chat-input-row { display: flex; gap: 8px; }
+  .chat-input {
+    flex: 1; padding: 11px 14px; border: 2px solid var(--border);
+    border-radius: 24px; font-size: 0.88rem; font-family: 'Inter', sans-serif;
+    background: var(--cream); outline: none;
+  }
+  .chat-input:focus { border-color: var(--plum); }
+  .chat-send {
+    background: var(--gold); color: var(--plum);
+    border: none; border-radius: 50%; width: 44px; height: 44px;
+    font-size: 1.1rem; cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .api-setup {
+    background: #f0e8ff; border: 2px solid var(--plum-mid);
+    border-radius: 14px; padding: 16px; margin-bottom: 14px;
+  }
+  .api-setup p { font-size: 0.83rem; color: var(--plum); margin-bottom: 10px; line-height: 1.5; }
+
+  #toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--plum); color: white;
+    padding: 11px 22px; border-radius: 24px;
+    font-size: 0.85rem; font-weight: 500;
+    z-index: 999; transition: transform 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  .weekly-bar {
+    display: flex; align-items: flex-end; gap: 6px;
+    height: 80px; margin: 12px 0;
+  }
+  .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar {
+    width: 100%; background: var(--gold); border-radius: 6px 6px 0 0;
+    transition: height 0.4s ease; min-height: 4px;
+  }
+  .bar-label { font-size: 0.65rem; color: var(--muted); }
+
+  .empty-state { text-align: center; padding: 28px 16px; color: var(--muted); }
+  .empty-state .emoji { font-size: 2rem; margin-bottom: 8px; }
+  .empty-state p { font-size: 0.83rem; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div>
+      <div class="header-name">Christine Ross</div>
+      <div class="header-sub">Creativity & Clarity for Moms</div>
+    </div>
+    <div class="fire">🔥</div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-box">
+      <input class="num-input" id="stat-members" type="number" value="30" onchange="saveStats()">
+      <div class="slabel">Members</div>
+    </div>
+    <div class="stat-box">
+      <input class="num-input" id="stat-hours" type="number" value="0" onchange="saveStats()">
+      <div class="slabel">Hrs Reclaimed</div>
+    </div>
+    <div class="stat-box">
+      <input class="num-input" id="stat-posts" type="number" value="0" onchange="saveStats()">
+      <div class="slabel">Posts This Wk</div>
+    </div>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('overview')"><span class="tab-icon">🏠</span>Home</div>
+  <div class="tab" onclick="showTab('members')"><span class="tab-icon">👩‍👧</span>Members</div>
+  <div class="tab" onclick="showTab('content')"><span class="tab-icon">📅</span>Content</div>
+  <div class="tab" onclick="showTab('prompts')"><span class="tab-icon">✨</span>Prompts</div>
+  <div class="tab" onclick="showTab('chat')"><span class="tab-icon">🤖</span>AI Chat</div>
+</div>
+
+<!-- HOME -->
+<div id="tab-overview" class="section active">
+  <p class="section-title">Your Week 🔥</p>
+  <p class="section-sub">Track what matters for your community.</p>
+
+  <div class="card">
+    <div class="card-title">📊 Weekly Engagement</div>
+    <div class="weekly-bar" id="week-bars"></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+      <span style="font-size:0.72rem;color:var(--muted)">Tap a day to log engagement →</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🎯 This Week's Focus</div>
+    <div class="form-group" style="margin-bottom:10px">
+      <textarea id="weekly-focus" placeholder="What's your focus for this week? e.g. Launch the weekly creativity challenge, welcome new members..." style="min-height:60px" oninput="saveFocus()"></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">💜 Community Win</div>
+    <div class="form-group" style="margin-bottom:10px">
+      <textarea id="community-win" placeholder="Log a win — a member breakthrough, a great post, someone reclaiming hours..." style="min-height:60px" oninput="saveWin()"></textarea>
+    </div>
+  </div>
+
+  <div class="card" style="background:linear-gradient(135deg,var(--plum),var(--plum-mid));color:white">
+    <div style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold-light);margin-bottom:8px">Help your members track their time</div>
+    <p style="font-size:0.82rem;color:rgba(255,255,255,0.8);margin-bottom:14px">Share CredSwap with each member — their personal time tracker so they can see where to take hours back for themselves.</p>
+    <button class="btn btn-gold btn-sm" onclick="toast('Copy the CredSwap link and drop it in your Skool group! 💜')">Share CredSwap Link</button>
+  </div>
+</div>
+
+<!-- MEMBERS -->
+<div id="tab-members" class="section">
+  <p class="section-title">Your Members</p>
+  <p class="section-sub">30 moms and growing. Track who's active and who needs a check-in.</p>
+
+  <div class="card">
+    <div class="form-group">
+      <label>Add a Member</label>
+      <input type="text" id="new-member-name" placeholder="Member name">
+    </div>
+    <div class="form-group">
+      <label>Status</label>
+      <select id="new-member-status">
+        <option value="new">New Member</option>
+        <option value="active">Active</option>
+        <option value="quiet">Needs Check-in</option>
+      </select>
+    </div>
+    <button class="btn btn-plum" onclick="addMember()">Add Member</button>
+  </div>
+
+  <div class="card">
+    <div id="member-list"></div>
+  </div>
+</div>
+
+<!-- CONTENT CALENDAR -->
+<div id="tab-content" class="section">
+  <p class="section-title">Content Calendar</p>
+  <p class="section-sub">Plan your Skool posts, challenges, and check-ins.</p>
+
+  <div class="card">
+    <div class="form-group">
+      <label>Day</label>
+      <input type="text" id="content-day" placeholder="e.g. Monday, June 16">
+    </div>
+    <div class="form-group">
+      <label>What are you posting?</label>
+      <input type="text" id="content-text" placeholder="e.g. Weekly creativity challenge post">
+    </div>
+    <div class="form-group">
+      <label>Type</label>
+      <select id="content-type">
+        <option>💬 Community Post</option>
+        <option>🎯 Weekly Challenge</option>
+        <option>👋 Member Check-in</option>
+        <option>🎉 Win Celebration</option>
+        <option>📚 Resource Drop</option>
+        <option>🔥 Engagement Question</option>
+      </select>
+    </div>
+    <button class="btn btn-plum" onclick="addContent()">Add to Calendar</button>
+  </div>
+
+  <div class="card">
+    <div id="content-list"></div>
+  </div>
+</div>
+
+<!-- PROMPTS -->
+<div id="tab-prompts" class="section">
+  <p class="section-title">Community Prompts ✨</p>
+  <p class="section-sub">Tap any prompt to copy it and use it in your Skool group.</p>
+
+  <div id="prompt-list"></div>
+</div>
+
+<!-- AI CHAT -->
+<div id="tab-chat" class="section">
+  <p class="section-title">Your Community AI 🤖</p>
+  <p class="section-sub">Ask anything about running your community, content ideas, or supporting your moms.</p>
+
+  <div id="api-setup-box" class="api-setup">
+    <p>Add your Groq API key to activate the AI chat. Your key stays on your device only.</p>
+    <div class="form-group">
+      <label>Groq API Key</label>
+      <input type="password" id="api-key-input" placeholder="gsk_...">
+    </div>
+    <button class="btn btn-plum" onclick="saveApiKey()">Save Key & Start Chatting</button>
+  </div>
+
+  <div id="chat-area" style="display:none">
+    <div class="chat-box" id="chat-box"></div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chat-input" placeholder="Ask about your community..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="chat-send" onclick="sendChat()">➤</button>
+    </div>
+    <button class="btn btn-sm" style="margin-top:10px;background:var(--border);color:var(--muted);width:auto" onclick="clearKey()">Remove API Key</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const PROMPTS = [
+  { label: '🔥 Engagement', text: "Mamas — real question: what's ONE thing you did this week just for YOU? No judgment, no minimizing it. Drop it below 👇" },
+  { label: '🎯 Weekly Challenge', text: "This week's challenge: find ONE hidden hour. It could be while the pasta boils, during naptime, before anyone wakes up. Log it in CredSwap and share what you did with it! 💜" },
+  { label: '💜 Check-in', text: "How are you actually doing this week? Not 'fine' — actually. This is a safe space. Drop a word, a sentence, or a whole essay. We're here. 🧡" },
+  { label: '🎨 Creativity', text: "What did you used to love doing before motherhood got loud? Art, music, writing, dancing, building things — what was yours? Tell me and let's find a way to bring it back." },
+  { label: '🏆 Celebrate a Win', text: "WINS ONLY POST 🎉 Big or tiny, it counts. Did you finish a book chapter? Take a solo walk? Say no to something? POST IT. We celebrate ALL of it here." },
+  { label: '📚 Resource', text: "Drop your favorite 5-minute creative activity below — something you can actually do while life is happening around you. Let's build a list together 📝" },
+  { label: '👋 Welcome', text: "New mamas in the group this week — introduce yourself! Tell us: your name, how many kids (optional), and one thing you want more of in your life right now 💜" },
+  { label: '🌙 Reflection', text: "End of week check-in: Did you find any time for yourself this week? Even 10 minutes counts. What did you do with it? What got in the way?" },
+  { label: '🔥 Bold Question', text: "Hot take: Moms are told self-care is selfish. But what if taking time for yourself is actually the most important thing you can do for your family? Agree or disagree — GO." },
+  { label: '✨ Identity', text: "Outside of being a mom — who ARE you? What words describe YOU, not your role? This week let's remember who we are beyond what we do for everyone else 💜" }
+];
+
+function loadState() {
+  const raw = localStorage.getItem('christine_dash');
+  if (raw) return JSON.parse(raw);
+  return {
+    members: [],
+    content: [],
+    engagement: { Mon:0, Tue:0, Wed:0, Thu:0, Fri:0, Sat:0, Sun:0 },
+    focus: '',
+    win: '',
+    stats: { members: 30, hours: 0, posts: 0 }
+  };
+}
+
+let state = loadState();
+
+function save() { localStorage.setItem('christine_dash', JSON.stringify(state)); }
+
+function showTab(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  const tabs = ['overview','members','content','prompts','chat'];
+  document.querySelectorAll('.tab')[tabs.indexOf(name)].classList.add('active');
+  if (name === 'members') renderMembers();
+  if (name === 'content') renderContent();
+  if (name === 'prompts') renderPrompts();
+  if (name === 'overview') renderBars();
+  if (name === 'chat') initChat();
+}
+
+function saveStats() {
+  state.stats.members = parseInt(document.getElementById('stat-members').value) || 0;
+  state.stats.hours = parseInt(document.getElementById('stat-hours').value) || 0;
+  state.stats.posts = parseInt(document.getElementById('stat-posts').value) || 0;
+  save();
+}
+
+function saveFocus() { state.focus = document.getElementById('weekly-focus').value; save(); }
+function saveWin() { state.win = document.getElementById('community-win').value; save(); }
+
+function renderBars() {
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const max = Math.max(...Object.values(state.engagement), 1);
+  document.getElementById('week-bars').innerHTML = days.map(d => `
+    <div class="bar-wrap" onclick="bumpDay('${d}')">
+      <div class="bar" style="height:${Math.max(8, (state.engagement[d]/max)*72)}px" title="${state.engagement[d]} interactions"></div>
+      <div class="bar-label">${d}</div>
+    </div>
+  `).join('');
+}
+
+function bumpDay(d) {
+  state.engagement[d] = (state.engagement[d] || 0) + 1;
+  save(); renderBars();
+  toast(d + ' engagement logged!');
+}
+
+// MEMBERS
+function addMember() {
+  const name = document.getElementById('new-member-name').value.trim();
+  const status = document.getElementById('new-member-status').value;
+  if (!name) { toast('Enter a name'); return; }
+  state.members.unshift({ name, status, added: today() });
+  save(); renderMembers();
+  document.getElementById('new-member-name').value = '';
+  toast(name + ' added 💜');
+}
+
+function renderMembers() {
+  const list = document.getElementById('member-list');
+  if (!state.members.length) {
+    list.innerHTML = '<div class="empty-state"><div class="emoji">👩‍👧</div><p>Add your members to track them here.</p></div>';
+    return;
+  }
+  const tagMap = { active: 'Active', new: 'New', quiet: 'Check-in' };
+  const classMap = { active: 'tag-active', new: 'tag-new', quiet: '' };
+  list.innerHTML = state.members.map((m, i) => `
+    <div class="member-item">
+      <div class="member-avatar">${m.name[0].toUpperCase()}</div>
+      <div style="flex:1">
+        <div class="member-name">${m.name}</div>
+        <div class="member-meta">Added ${m.added}</div>
+      </div>
+      <span class="member-tag ${classMap[m.status]}">${tagMap[m.status]}</span>
+    </div>
+  `).join('');
+}
+
+// CONTENT
+function addContent() {
+  const day = document.getElementById('content-day').value.trim();
+  const text = document.getElementById('content-text').value.trim();
+  const type = document.getElementById('content-type').value;
+  if (!day || !text) { toast('Fill in day and content'); return; }
+  state.content.unshift({ day, text, type, done: false });
+  save(); renderContent();
+  document.getElementById('content-day').value = '';
+  document.getElementById('content-text').value = '';
+  toast('Added to calendar!');
+}
+
+function toggleDone(i) {
+  state.content[i].done = !state.content[i].done;
+  save(); renderContent();
+}
+
+function renderContent() {
+  const list = document.getElementById('content-list');
+  if (!state.content.length) {
+    list.innerHTML = '<div class="empty-state"><div class="emoji">📅</div><p>Plan your first post above.</p></div>';
+    return;
+  }
+  list.innerHTML = state.content.map((c, i) => `
+    <div class="content-item" style="${c.done ? 'opacity:0.5' : ''}">
+      <div class="content-day">${c.day.split(' ').slice(0,2).join('<br>')}</div>
+      <div style="flex:1">
+        <div class="content-text" style="${c.done ? 'text-decoration:line-through' : ''}">${c.text}</div>
+        <div class="content-type">${c.type}</div>
+      </div>
+      <button class="check-btn ${c.done ? 'done' : ''}" onclick="toggleDone(${i})">${c.done ? '✓' : ''}</button>
+    </div>
+  `).join('');
+}
+
+// PROMPTS
+function renderPrompts() {
+  document.getElementById('prompt-list').innerHTML = PROMPTS.map(p => `
+    <div class="prompt-card" onclick="copyPrompt('${p.text.replace(/'/g,"\\'")}')">
+      <div class="prompt-label">${p.label}</div>
+      <div class="prompt-text">${p.text}</div>
+      <div class="prompt-tap">Tap to copy 👆</div>
+    </div>
+  `).join('');
+}
+
+function copyPrompt(text) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => toast('Copied! Paste it in Skool 💜'));
+  } else {
+    toast('Long press to copy the text 💜');
+  }
+}
+
+// AI CHAT
+function initChat() {
+  const key = localStorage.getItem('christine_groq_key');
+  if (key) {
+    document.getElementById('api-setup-box').style.display = 'none';
+    document.getElementById('chat-area').style.display = 'block';
+    if (document.getElementById('chat-box').children.length === 0) {
+      addMsg('ai', "Hi Christine! 🔥 I'm your community assistant. Ask me for post ideas, challenge prompts, how to re-engage quiet members, or anything else about running Creativity & Clarity for Moms.");
+    }
+  }
+}
+
+function saveApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key.startsWith('gsk_')) { toast('That doesn\'t look like a Groq key'); return; }
+  localStorage.setItem('christine_groq_key', key);
+  initChat();
+  toast('Key saved! Chat is live 🔥');
+}
+
+function clearKey() {
+  localStorage.removeItem('christine_groq_key');
+  document.getElementById('api-setup-box').style.display = 'block';
+  document.getElementById('chat-area').style.display = 'none';
+  document.getElementById('chat-box').innerHTML = '';
+}
+
+function addMsg(role, text) {
+  const box = document.getElementById('chat-box');
+  const div = document.createElement('div');
+  div.className = 'msg msg-' + role;
+  div.textContent = text;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return div;
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const key = localStorage.getItem('christine_groq_key');
+  if (!key) { toast('Add your Groq key first'); return; }
+
+  input.value = '';
+  addMsg('user', text);
+  const thinking = addMsg('ai', '...');
+  thinking.classList.add('msg-thinking');
+
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        messages: [
+          { role: 'system', content: 'You are Christine Ross\'s community assistant for "Creativity & Clarity for Moms" — a Skool community helping busy moms reclaim 5+ hours a week for creative, fulfilling activities. Help Christine with post ideas, engagement strategies, weekly challenges, member support, and community growth. Be warm, direct, and practical. Keep responses concise and mobile-friendly.' },
+          { role: 'user', content: text }
+        ],
+        max_tokens: 500
+      })
+    });
+    const data = await res.json();
+    thinking.textContent = data.choices?.[0]?.message?.content || 'Something went wrong. Try again.';
+    thinking.classList.remove('msg-thinking');
+  } catch(e) {
+    thinking.textContent = 'Connection error. Check your key and try again.';
+    thinking.classList.remove('msg-thinking');
+  }
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function today() {
+  return new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+// Init
+document.getElementById('weekly-focus').value = state.focus || '';
+document.getElementById('community-win').value = state.win || '';
+document.getElementById('stat-members').value = state.stats?.members || 30;
+document.getElementById('stat-hours').value = state.stats?.hours || 0;
+document.getElementById('stat-posts').value = state.stats?.posts || 0;
+renderBars();
+</script>
+</body>
+</html>
